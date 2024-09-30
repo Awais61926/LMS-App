@@ -1,0 +1,1 @@
+export const SPLASH_TAGLINE="Your education, personalized"
