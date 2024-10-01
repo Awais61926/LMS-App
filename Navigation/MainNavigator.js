@@ -4,6 +4,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import Splash from '../Splash';
 import ChooseUserType from '../ChooseUserType';
+import Login from '../login/Login';
+import TutorHome from '../tutor/TutorHome';
 
 const Stack = createStackNavigator();
 export default function MainNavigator() {
@@ -11,7 +13,10 @@ export default function MainNavigator() {
     <NavigationContainer>
       <Stack.Navigator>
       <Stack.Screen name="Splash" component={Splash} options={{headerShown:false}} />
-      <Stack.Screen name="ChooseUserType" component={ChooseUserType} options={{headerShown:false}} />
+      <Stack.Screen name='ChooseUserType' component={ChooseUserType} options={{headerShown:false}} />
+      <Stack.Screen name='Login' component={Login} options={{headerShown:false}} />
+      <Stack.Screen name='TutorHome' component={TutorHome} options={{headerShown:false}} />
+      
     </Stack.Navigator>
     </NavigationContainer>
   )
