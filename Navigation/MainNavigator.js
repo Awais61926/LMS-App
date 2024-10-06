@@ -6,6 +6,7 @@ import Splash from '../Splash';
 import ChooseUserType from '../ChooseUserType';
 import Login from '../login/Login';
 import TutorHome from '../tutor/TutorHome';
+import AddCourse from '../tutor/courses/AddCourse';
 
 const Stack = createStackNavigator();
 export default function MainNavigator() {
@@ -16,6 +17,7 @@ export default function MainNavigator() {
       <Stack.Screen name='ChooseUserType' component={ChooseUserType} options={{headerShown:false}} />
       <Stack.Screen name='Login' component={Login} options={{headerShown:false}} />
       <Stack.Screen name='TutorHome' component={TutorHome} options={{headerShown:false}} />
+      <Stack.Screen name='AddCourse' component={AddCourse} options={{headerShown:true}} />
       
     </Stack.Navigator>
     </NavigationContainer>
