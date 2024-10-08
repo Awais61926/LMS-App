@@ -1,43 +1,71 @@
-import { View, Text, StyleSheet, Touchable, TouchableOpacity, Image } from 'react-native'
-import React from 'react'
-import { moderateScale, scale } from 'react-native-size-matters'
-import { THEME_COLOR, WHITE } from '../utils/Colors'
-import { useNavigation } from '@react-navigation/native'
-import AddCourse from './courses/AddCourse'
-import { FlatList } from 'react-native-gesture-handler'
-import Courses from './courses/courses'
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React from 'react';
+import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
+import { THEME_COLOR, WHITE } from '../utils/Colors';
+import { useNavigation } from '@react-navigation/native';
+import { FlatList } from 'react-native-gesture-handler';
+import CoursesList from './courses/CoursesList';
 
 export default function LiveCourses() {
     const navigation = useNavigation();
-    return (
-        <View style={styles.constainer}>
-            <FlatList
-            data={[1,2,3,4,5,6,7]} renderItem={({item,index})=>{
-                return <Courses item={item} index={index}/>
-            }}
 
+    return (
+        <View style={styles.container}>
+            {/* Course List */}
+            <FlatList
+                data={[1, 2, 3, 4, 5]} 
+                renderItem={({ item, index }) => {
+                    return <CoursesList item={item} index={index} />;
+                }}
+                keyExtractor={(item, index) => index.toString()}
+                contentContainerStyle={styles.listContent}
             />
-            <View style={{ justifyContent: 'flex-end', width: moderateScale(100), height: moderateScale(100), elevation: 150, borderRadius: moderateScale(20), marginRight: scale(70), marginBottom: scale(50) }}>
-                <TouchableOpacity style={styles.btn} onPress={()=>navigation.navigate('AddCourse')}>
-                    <Text style={{ fontSize: scale(18), padding: 2, color:WHITE }}>Add Courses</Text>
-                    <Image source={require('../images/plus2.png')} style={{ width: 40, height: 40 }} />
+            
+            {/* Add Course Button */}
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('AddCourse')}>
+                    <Text style={styles.btnText}>Add Courses</Text>
+                    <Image source={require('../images/plus2.png')} style={styles.btnImage} />
                 </TouchableOpacity>
             </View>
-
         </View>
-    )
+    );
 }
+
 const styles = StyleSheet.create({
-    constainer: {
+    container: {
         flex: 1,
-
-        justifyContent: 'flex-end',
-        alignItems: 'flex-end'
-
-
+        paddingHorizontal: scale(15),
+        backgroundColor: 'white',
+    },
+    listContent: {
+        paddingBottom: verticalScale(80), // Provide bottom padding so the button doesn’t overlap with the list
+    },
+    buttonContainer: {
+        position: 'absolute', // Ensures button stays fixed at the bottom
+        bottom: scale(20),
+        right: scale(20),
+        elevation: 20,
     },
     btn: {
-        backgroundColor: 'red', width: moderateScale(165), height: moderateScale(55), justifyContent: 'center', alignItems: 'center', borderRadius: 40, flexDirection:'row-reverse', elevation:20
-
-    }
-})
+        backgroundColor: 'red',
+        width: moderateScale(165),
+        height: moderateScale(55),
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 40,
+        flexDirection: 'row-reverse',
+        paddingHorizontal: scale(10),
+        elevation: 10,
+    },
+    btnText: {
+        fontSize: scale(18),
+        padding: 2,
+        color: WHITE,
+    },
+    btnImage: {
+        width: moderateScale(40),
+        height: moderateScale(40),
+        marginLeft: scale(5),
+    },
+});
