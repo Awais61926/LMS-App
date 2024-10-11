@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, Switch } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Switch } from 'react-native'; 
 import React, { useState } from 'react';
 import CustomTextInput from '../../components/CustomTextInput';
 import { useNavigation } from '@react-navigation/native';
@@ -8,7 +8,8 @@ import BgButton from '../../components/BgButton';
 import { TEXT_COLOR, THEME_COLOR, WHITE } from '../../utils/Colors';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Add AsyncStorage import
+import { launchCamera } from 'react-native-image-picker';
 
 const AddCourse = () => {
     const [title, setTitle] = useState('');
@@ -27,6 +28,14 @@ const AddCourse = () => {
 
     const uploadCourse = async () => {
         try {
+            // Retrieve user email from AsyncStorage
+            const userEmail = await AsyncStorage.getItem('userEmail');
+            
+            if (!userEmail) {
+                console.log("User email not found in AsyncStorage");
+                return;
+            }
+
             // Upload the banner image to Firebase Storage
             const reference = storage().ref(bannerImage.assets[0].fileName);
             const pathToFile = bannerImage.assets[0].uri;
@@ -38,9 +47,10 @@ const AddCourse = () => {
             // Store the course data in Firestore
             await firestore().collection('courses').add({
                 title: title,
-                description: Disc,  // Fixed typo
+                description: Disc,
                 price: price,
                 active: isActive,
+                email: userEmail,  // Upload email with course data
                 bannerImage: url,
             });
 
@@ -74,12 +84,11 @@ const AddCourse = () => {
                 <Text style={styles.switchText}>Course is Active</Text>
                 <Switch value={isActive} onValueChange={(value) => setIsActive(value)} />
             </View>
-            <TouchableOpacity style={styles.btn}
-                onPress={uploadCourse}>
 
+            <TouchableOpacity style={styles.btn} onPress={uploadCourse}>
                 <Text style={styles.title}>Upload</Text>
             </TouchableOpacity>
-        </ScrollView >
+        </ScrollView>
     );
 };
 
@@ -117,7 +126,6 @@ const styles = StyleSheet.create({
         color: 'black',
     },
     btn: {
-
         width: '90%',
         height: moderateVerticalScale(50),
         justifyContent: 'center',
@@ -126,14 +134,10 @@ const styles = StyleSheet.create({
         margin: moderateScale(10),
         borderRadius: moderateScale(10),
         backgroundColor: THEME_COLOR
-
     },
     title: {
         fontSize: moderateScale(16),
         fontWeight: '700',
         color: TEXT_COLOR
-
-
     }
-
 });

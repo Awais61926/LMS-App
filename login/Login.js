@@ -6,7 +6,6 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth'; // Firebase Authentication import
 
-
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,11 +20,11 @@ export default function Login() {
 
     auth()
       .signInWithEmailAndPassword(email, password)
-      .then(async(email) => {
+      .then(async() => {
         console.log('User signed in!');
-        const jsonValue = JSON.stringify(email);
-        await AsyncStorage.setItem('userEmail', jsonValue);
-        // Navigate to the next screen (e.g., TutorHome) after successful login
+        // Store email string directly
+        await AsyncStorage.setItem('userEmail', email);
+
         if (route.params?.Screen === 'tutor') {
           navigation.navigate('TutorHome');
         } else {
@@ -88,43 +87,43 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: BG_COLOR,
-    paddingHorizontal: scale(20),
-  },
-  banner: {
-    width: '100%',
-    height: moderateVerticalScale(210),
-  },
-  txt: {
-    fontSize: moderateScale(25),
-    fontWeight: '700',
-    color: TEXT_COLOR,
-    alignSelf: 'center',
-    marginTop: moderateScale(5),
-  },
-  input: {
-    width: '100%',
-    height: moderateVerticalScale(50),
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: moderateScale(10),
-    paddingHorizontal: moderateScale(10),
-    marginVertical: moderateScale(10),
-    color: TEXT_COLOR,
-    fontSize: moderateScale(16),
-  },
-  loginButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: moderateVerticalScale(12),
-    borderRadius: moderateScale(10),
-    alignItems: 'center',
-    marginVertical: moderateScale(10),
-  },
-  loginButtonText: {
-    color: WHITE,
-    fontSize: moderateScale(18),
-    fontWeight: '600',
-  },
+    container: {
+        flex: 1,
+        backgroundColor: BG_COLOR,
+        paddingHorizontal: scale(20),
+      },
+      banner: {
+        width: '100%',
+        height: moderateVerticalScale(210),
+      },
+      txt: {
+        fontSize: moderateScale(25),
+        fontWeight: '700',
+        color: TEXT_COLOR,
+        alignSelf: 'center',
+        marginTop: moderateScale(5),
+      },
+      input: {
+        width: '100%',
+        height: moderateVerticalScale(50),
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: moderateScale(10),
+        paddingHorizontal: moderateScale(10),
+        marginVertical: moderateScale(10),
+        color: TEXT_COLOR,
+        fontSize: moderateScale(16),
+      },
+      loginButton: {
+        backgroundColor: '#4CAF50',
+        paddingVertical: moderateVerticalScale(12),
+        borderRadius: moderateScale(10),
+        alignItems: 'center',
+        marginVertical: moderateScale(10),
+      },
+      loginButtonText: {
+        color: WHITE,
+        fontSize: moderateScale(18),
+        fontWeight: '600',
+      },
 });

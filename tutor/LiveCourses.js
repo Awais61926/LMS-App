@@ -49,13 +49,13 @@ const styles = StyleSheet.create({
     },
     btn: {
         backgroundColor: 'red',
-        width: moderateScale(165),
+        width: moderateScale(200),
         height: moderateScale(55),
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         borderRadius: 40,
         flexDirection: 'row-reverse',
-        paddingHorizontal: scale(10),
+        paddingHorizontal: scale(15),
         elevation: 10,
     },
     btnText: {
