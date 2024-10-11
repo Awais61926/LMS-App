@@ -1,48 +1,89 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, Switch } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Image, Switch } from 'react-native';
+import React, { useState } from 'react';
 import CustomTextInput from '../../components/CustomTextInput';
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native';
 import { moderateScale, moderateVerticalScale, scale, verticalScale } from 'react-native-size-matters';
 import { ScrollView } from 'react-native-gesture-handler';
 import BgButton from '../../components/BgButton';
-import { WHITE } from '../../utils/Colors';
+import { TEXT_COLOR, THEME_COLOR, WHITE } from '../../utils/Colors';
+import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
-export default function AddCourse() {
+const AddCourse = () => {
     const [title, setTitle] = useState('');
     const [price, setPrice] = useState('');
     const [Disc, setDisc] = useState('');
     const [isActive, setIsActive] = useState(true);
+    const [bannerImage, setBannerImage] = useState(null);
     const navigation = useNavigation();
+
+    const addBanner = async () => {
+        const res = await launchCamera({ mediaType: 'photo' });
+        if (!res.didCancel) {
+            setBannerImage(res);
+        }
+    };
+
+    const uploadCourse = async () => {
+        try {
+            // Upload the banner image to Firebase Storage
+            const reference = storage().ref(bannerImage.assets[0].fileName);
+            const pathToFile = bannerImage.assets[0].uri;
+            await reference.putFile(pathToFile);
+
+            // Get the download URL
+            const url = await storage().ref(bannerImage.assets[0].fileName).getDownloadURL();
+
+            // Store the course data in Firestore
+            await firestore().collection('courses').add({
+                title: title,
+                description: Disc,  // Fixed typo
+                price: price,
+                active: isActive,
+                bannerImage: url,
+            });
+
+            console.log('Course data stored successfully');
+            navigation.goBack();
+        } catch (error) {
+            console.error('Error uploading course:', error);
+        }
+    };
 
     return (
         <ScrollView style={styles.container}>
+            <View></View>
             <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
-                <TouchableOpacity style={styles.banner}>
-                    <Image source={require('../../images/plus2.png')} style={styles.img} />
-                    <Text style={{ fontWeight: '800', color: 'black' }}>Select Banner</Text>
+                <TouchableOpacity style={styles.banner} onPress={addBanner}>
+                    {bannerImage != null ? (
+                        <Image source={{ uri: bannerImage.assets[0].uri }} style={{ width: scale(200), height: scale(170) }} />
+                    ) : (
+                        <>
+                            <Image source={require('../../images/plus2.png')} style={styles.img} />
+                            <Text style={{ fontWeight: '800', color: 'black' }}>Select Banner</Text>
+                        </>
+                    )}
                 </TouchableOpacity>
             </View>
-            <CustomTextInput placeholder="Enter Course Title" onChangeText={(txt) => {
-                setTitle(txt)
-            }} />
-            <CustomTextInput placeholder="Enter Description" multiline={true} onChangeText={(txt) => {
-                setDisc(txt)
-            }} />
-            <CustomTextInput placeholder="Enter Price in PKR" keyboardType='numeric' onChangeText={(txt) => {
-                setPrice(txt)
-            }} />
-            
+            <CustomTextInput placeholder="Enter Course Title" onChangeText={(txt) => setTitle(txt)} />
+            <CustomTextInput placeholder="Enter Description" multiline={true} onChangeText={(txt) => setDisc(txt)} />
+            <CustomTextInput placeholder="Enter Price in PKR" keyboardType="numeric" onChangeText={(txt) => setPrice(txt)} />
+
             <View style={styles.switchContainer}>
                 <Text style={styles.switchText}>Course is Active</Text>
-                <Switch
-                    value={isActive}
-                    onValueChange={(value) => setIsActive(value)}
-                />
+                <Switch value={isActive} onValueChange={(value) => setIsActive(value)} />
             </View>
-            <BgButton title='Upload Course' color={WHITE}/>
-        </ScrollView>
+            <TouchableOpacity style={styles.btn}
+                onPress={uploadCourse}>
+
+                <Text style={styles.title}>Upload</Text>
+            </TouchableOpacity>
+        </ScrollView >
     );
-}
+};
+
+export default AddCourse;
 
 const styles = StyleSheet.create({
     container: {
@@ -65,14 +106,34 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         width: '90%',
         height: moderateVerticalScale(40),
-        flexDirection: 'row',  
-        alignItems: 'center',  
-        justifyContent: 'space-between',  
-        paddingHorizontal: moderateScale(10), 
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: moderateScale(10),
     },
     switchText: {
         fontSize: 16,
         fontWeight: '600',
         color: 'black',
     },
+    btn: {
+
+        width: '90%',
+        height: moderateVerticalScale(50),
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'center',
+        margin: moderateScale(10),
+        borderRadius: moderateScale(10),
+        backgroundColor: THEME_COLOR
+
+    },
+    title: {
+        fontSize: moderateScale(16),
+        fontWeight: '700',
+        color: TEXT_COLOR
+
+
+    }
+
 });

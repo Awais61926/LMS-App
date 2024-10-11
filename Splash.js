@@ -9,6 +9,8 @@ import ChooseUserType from './ChooseUserType';
 
 export default function Splash() {
     const navigation=useNavigation();
+    //const value = await AsyncStorage.getItem('useremail');
+    
     useEffect(() => {
         const timer = setTimeout(() => {
           console.log('Navigating to ChooseUserType...');
@@ -21,6 +23,7 @@ export default function Splash() {
             <StatusBar backgroundColor={THEME_COLOR} />
             <Image source={require('./images/logo.png')} style={styles.logo} />
             <Text style={styles.txt}>{SPLASH_TAGLINE}</Text>
+           
         </View>
     )
 }
@@ -41,4 +44,4 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: TEXT_COLOR
     }
-});
+}); 
