@@ -1,24 +1,45 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import auth from '@react-native-firebase/auth'; // Firebase Auth import
+import auth from '@react-native-firebase/auth';
+import { Dropdown } from 'react-native-element-dropdown';
+import { TEXT_COLOR } from '../utils/Colors';
+import firestore from '@react-native-firebase/firestore'
+import { scale } from 'react-native-size-matters';
+import { useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Register = ({ navigation }) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const route = useRoute();
 
-  const handleSignUp = () => {
-    if (email === '' || password === '') {
+  const data=[
+    {label1: 'Tutor', value:'Tutor'},
+    {label2:'Learner', value:'Learner'}
+  ]
+  const [username, setuserName] = useState('');
+  const [useremail, setuserEmail] = useState('');
+  // const [userRole, setuserRole] = useState('');
+  const [password, setPassword] = useState('');
+  // setuserRole=route.params.Screen;
+
+   const handleSignUp = async () => {
+    await AsyncStorage.setItem('userName', username);
+    
+    if (useremail === '' || password === '') {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then(() => {
-        Alert.alert('Success', 'User account created & signed in!');
-        // Optionally, navigate the user to another screen
-        // navigation.navigate('Home');
+      .createUserWithEmailAndPassword(useremail, password)
+      .then(async () => {
+        Alert.alert('Success! User Account Created');
+        firestore().collection('users').add({
+          email:useremail,
+          name:username,
+          password:password,
+        })
+        
+        navigation.navigate('Login');
       })
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {
@@ -43,8 +64,8 @@ const Register = ({ navigation }) => {
         style={styles.input}
         placeholder="Enter Name"
         placeholderTextColor="#aaa"
-        value={name}
-        onChangeText={setName}
+        value={username}
+        onChangeText={setuserName}
       />
 
       {/* Email Input */}
@@ -52,8 +73,8 @@ const Register = ({ navigation }) => {
         style={styles.input}
         placeholder="Enter Email"
         placeholderTextColor="#aaa"
-        value={email}
-        onChangeText={setEmail}
+        value={useremail}
+        onChangeText={setuserEmail}
         keyboardType="email-address"
         autoCapitalize="none"
       />
@@ -67,6 +88,12 @@ const Register = ({ navigation }) => {
         onChangeText={setPassword}
         secureTextEntry
       />
+      {/* <Dropdown data={data} maxHeight={300}
+          placeholderStyle={{color:TEXT_COLOR}}
+          search
+          labelField="label"
+          valueField="value" 
+          inputSearchStyle={{color:TEXT_COLOR, fontSize:scale(15)}}/> */}
 
       {/* Sign Up Button */}
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>

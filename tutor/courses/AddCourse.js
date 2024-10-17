@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'; // Add Asy
 import { launchCamera } from 'react-native-image-picker';
 
 const AddCourse = () => {
+    const[userid,setuserid]= useState('');
     const [title, setTitle] = useState('');
     const [price, setPrice] = useState('');
     const [Disc, setDisc] = useState('');
@@ -25,26 +26,32 @@ const AddCourse = () => {
             setBannerImage(res);
         }
     };
-
     const uploadCourse = async () => {
         try {
+            // Generate random user ID
+            const userID = parseInt(Math.random() * 10000); 
+            console.log("Generated user ID is:", userID);
+    
+            // Store userID in AsyncStorage
+            await AsyncStorage.setItem('userID', userID.toString());
+    
             // Retrieve user email from AsyncStorage
             const userEmail = await AsyncStorage.getItem('userEmail');
-            
+    
             if (!userEmail) {
                 console.log("User email not found in AsyncStorage");
                 return;
             }
-
+    
             // Upload the banner image to Firebase Storage
             const reference = storage().ref(bannerImage.assets[0].fileName);
             const pathToFile = bannerImage.assets[0].uri;
             await reference.putFile(pathToFile);
-
+    
             // Get the download URL
             const url = await storage().ref(bannerImage.assets[0].fileName).getDownloadURL();
-
-            // Store the course data in Firestore
+    
+            // Store the course data in Firestore, directly using `userID`
             await firestore().collection('courses').add({
                 title: title,
                 description: Disc,
@@ -52,15 +59,16 @@ const AddCourse = () => {
                 active: isActive,
                 email: userEmail,  // Upload email with course data
                 bannerImage: url,
+                userID: userID.toString(), // Using the generated userID directly
             });
-
+    
             console.log('Course data stored successfully');
             navigation.goBack();
         } catch (error) {
             console.error('Error uploading course:', error);
         }
     };
-
+    
     return (
         <ScrollView style={styles.container}>
             <View></View>

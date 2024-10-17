@@ -26,7 +26,7 @@ export default function ChooseUserType() {
       title={STD_TYPE}
       onClick={()=>{navigation.navigate('Login',
     {
-      Screen:'Student'
+      Screen:'tutor'
     })
         
     }}

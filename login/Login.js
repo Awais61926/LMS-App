@@ -12,11 +12,13 @@ export default function Login() {
   const route = useRoute();
   const navigation = useNavigation();
 
-  const handleLogin = () => {
+
+  const handleLogin = async() => {
     if (email === '' || password === '') {
       Alert.alert('Validation Error', 'Please enter both email and password');
       return;
     }
+    // await AsyncStorage.setItem('userRole', route.params.Screen);
 
     auth()
       .signInWithEmailAndPassword(email, password)
@@ -24,7 +26,6 @@ export default function Login() {
         console.log('User signed in!');
         // Store email string directly
         await AsyncStorage.setItem('userEmail', email);
-
         if (route.params?.Screen === 'tutor') {
           navigation.navigate('TutorHome');
         } else {

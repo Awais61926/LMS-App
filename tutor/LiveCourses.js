@@ -1,23 +1,42 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import { THEME_COLOR, WHITE } from '../utils/Colors';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { FlatList } from 'react-native-gesture-handler';
 import CoursesList from './courses/CoursesList';
+import firestore from '@react-native-firebase/firestore'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LiveCourses() {
     const navigation = useNavigation();
+    const [courses,setCourses]=useState([]);
+    const isFocused = useIsFocused();
+    useEffect(()=>{
+        getCourses();
 
+
+    },[isFocused])
+    const getCourses=async()=>{
+        const userID = await AsyncStorage.getItem('userID');
+        const data= firestore().collection("courses").get();
+        
+        console.log((await data).docs);
+        const temp=[];
+        (await data).docs.forEach(item=>{
+            temp.push({courseID: item.id,...item.data()});
+        });
+        setCourses(temp)
+
+    }
     return (
         <View style={styles.container}>
             {/* Course List */}
             <FlatList
-                data={[1, 2, 3, 4, 5]} 
+                data={courses} 
                 renderItem={({ item, index }) => {
                     return <CoursesList item={item} index={index} />;
                 }}
-                keyExtractor={(item, index) => index.toString()}
                 contentContainerStyle={styles.listContent}
             />
             

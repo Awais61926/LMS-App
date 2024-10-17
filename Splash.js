@@ -1,47 +1,66 @@
-import { View, Text, StyleSheet, Image, StatusBar } from 'react-native'
-import React from 'react';
-import NavigationContainer from '@react-navigation/native';
-import { useEffect } from 'react';
+import { View, Text, StyleSheet, Image, StatusBar } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Ensure you have this import
+import { useNavigation } from '@react-navigation/native';
 import { BG_COLOR, TEXT_COLOR, THEME_COLOR } from './utils/Colors';
 import { SPLASH_TAGLINE } from './utils/Strings';
-import { useNavigation } from '@react-navigation/native';
 import ChooseUserType from './ChooseUserType';
 
-export default function Splash() {
-    const navigation=useNavigation();
-    //const value = await AsyncStorage.getItem('useremail');
-    
-    useEffect(() => {
-        const timer = setTimeout(() => {
-          console.log('Navigating to ChooseUserType...');
-          navigation.navigate('ChooseUserType');
-        }, 3000);
+function Splash() {
+  const navigation = useNavigation();
+  const [userEmail, setUserEmail] = useState(null);
 
-      }, []);
-    return (
-        <View style={styles.container}>
-            <StatusBar backgroundColor={THEME_COLOR} />
-            <Image source={require('./images/logo.png')} style={styles.logo} />
-            <Text style={styles.txt}>{SPLASH_TAGLINE}</Text>
-           
-        </View>
-    )
-}
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: THEME_COLOR
-
-    },
-    logo: {
-        width: 250,
-        height: 250
-    },
-    txt: {
-        fontSize: 25,
-        fontWeight: 'bold',
-        color: TEXT_COLOR
+  const checkUserEmail = async () => {
+    try {
+      const email = await AsyncStorage.getItem('userEmail');
+      setUserEmail(email);
+    } catch (error) {
+      console.error('Failed to retrieve user email:', error);
     }
-}); 
+  };
+
+  useEffect(() => {
+    checkUserEmail();
+    
+    const timer = setTimeout(() => {
+      if (userEmail) {
+        navigation.navigate('TutorHome');
+      } else {
+        navigation.navigate('ChooseUserType');
+      }
+    }, 3000);
+    
+
+    return () => clearTimeout(timer); // Cleanup the timer when the component unmounts
+  }, [userEmail, navigation]); // adding userEmail and navigation as dependencies
+
+  return (
+    <View style={styles.container}>
+      <StatusBar backgroundColor={THEME_COLOR} />
+      <Image source={require('./images/logo.png')} style={styles.logo} />
+      <Text style={styles.txt}>{SPLASH_TAGLINE}</Text>
+      {/* Display userEmail in uppercase if it exists */}
+      <Text style={[styles.txt,{color:'green'}]}>Welcome! {userEmail ? userEmail.toUpperCase() : ''}</Text>
+    </View>
+  );
+}
+
+export default Splash;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: THEME_COLOR
+  },
+  logo: {
+    width: 250,
+    height: 250
+  },
+  txt: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    color: TEXT_COLOR
+  }
+});
