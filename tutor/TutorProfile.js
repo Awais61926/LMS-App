@@ -6,6 +6,7 @@ import firestore from '@react-native-firebase/firestore'; // Use this for Firest
 import { useNavigation } from '@react-navigation/native';
 import { scale } from 'react-native-size-matters';
 import { TEXT_COLOR, THEME_COLOR } from '../utils/Colors';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function TutorProfile() {
   const navigation = useNavigation();
@@ -59,7 +60,7 @@ export default function TutorProfile() {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={{ justifyContent: 'center', alignItems: 'center' }}>
         <Image source={require('../images/profile3.png')} style={styles.img} />
         
@@ -75,7 +76,7 @@ export default function TutorProfile() {
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 

@@ -19,12 +19,15 @@ export default function LiveCourses() {
     },[isFocused])
     const getCourses=async()=>{
         const userID = await AsyncStorage.getItem('userID');
-        const data= firestore().collection("courses").get();
-        
+        const email = await AsyncStorage.getItem('userEmail');
+        const data = await firestore()
+            .collection('courses')
+            .where('email', '==', email)
+            .get();
         console.log((await data).docs);
         const temp=[];
         (await data).docs.forEach(item=>{
-            temp.push({courseID: item.id,...item.data()});
+            temp.push({...item.data()});
         });
         setCourses(temp)
 
@@ -67,7 +70,7 @@ const styles = StyleSheet.create({
         elevation: 20,
     },
     btn: {
-        backgroundColor: 'red',
+        backgroundColor: THEME_COLOR,
         width: moderateScale(200),
         height: moderateScale(55),
         justifyContent: 'flex-start',
@@ -83,8 +86,9 @@ const styles = StyleSheet.create({
         color: WHITE,
     },
     btnImage: {
-        width: moderateScale(40),
-        height: moderateScale(40),
+        alignItems:'center',
+        width: moderateScale(30),
+        height: moderateScale(30),
         marginLeft: scale(5),
     },
 });

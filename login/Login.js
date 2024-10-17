@@ -5,86 +5,100 @@ import { moderateScale, moderateVerticalScale, scale } from 'react-native-size-m
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth'; // Firebase Authentication import
-
+import { ScrollView } from 'react-native-gesture-handler';
+import { firebase } from '@react-native-firebase/auth';
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const route = useRoute();
-  const navigation = useNavigation();
-
-
-  const handleLogin = async() => {
-    if (email === '' || password === '') {
-      Alert.alert('Validation Error', 'Please enter both email and password');
-      return;
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const route = useRoute();
+    const navigation = useNavigation();
+    const ForgotPass = () => {
+        auth().sendPasswordResetEmail(email)
+            .then(() => {
+                Alert.alert('password reset email send!')
+            }).catch((error) => {
+                Alert.alert(error)
+            })
     }
-    // await AsyncStorage.setItem('userRole', route.params.Screen);
 
-    auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(async() => {
-        console.log('User signed in!');
-        // Store email string directly
-        await AsyncStorage.setItem('userEmail', email);
-        if (route.params?.Screen === 'tutor') {
-          navigation.navigate('TutorHome');
-        } else {
-          navigation.navigate('TutorHome');
+
+
+    const handleLogin = async () => {
+        if (email === '' || password === '') {
+            Alert.alert('Validation Error', 'Please enter both email and password');
+            return;
         }
-      })
-      .catch(error => {
-        if (error.code === 'auth/user-not-found') {
-          Alert.alert('Error', 'No user found with this email');
-        } else if (error.code === 'auth/wrong-password') {
-          Alert.alert('Error', 'Incorrect password');
-        } else {
-          Alert.alert('Error', error.message);
-        }
-      });
-  };
+        // await AsyncStorage.setItem('userRole', route.params.Screen);
 
-  return (
-    <View style={styles.container}>
-      <Image source={require('../images/login.jpg')} style={styles.banner} />
-      <Text style={styles.txt}>Login</Text>
+        auth()
+            .signInWithEmailAndPassword(email, password)
+            .then(async () => {
+                console.log('User signed in!');
+                // Store email string directly
+                await AsyncStorage.setItem('userEmail', email);
+                if (route.params?.Screen === 'tutor') {
+                    navigation.navigate('TutorHome');
+                } else {
+                    navigation.navigate('TutorHome');
+                }
+            })
+            .catch(error => {
+                if (error.code === 'auth/user-not-found') {
+                    Alert.alert('Error', 'No user found with this email');
+                } else if (error.code === 'auth/wrong-password') {
+                    Alert.alert('Error', 'Incorrect password');
+                } else {
+                    Alert.alert('Error', error.message);
+                }
+            });
+    };
 
-      {/* Email TextInput */}
-      <TextInput
-        style={styles.input}
-        placeholder="Enter Email"
-        placeholderTextColor="#999"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+    return (
+        <ScrollView style={styles.container}>
+            <Image source={require('../images/login.jpg')} style={styles.banner} />
+            <Text style={styles.txt}>Login</Text>
 
-      {/* Password TextInput */}
-      <TextInput
-        style={styles.input}
-        placeholder="Enter Password"
-        placeholderTextColor="#999"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry={true}
-      />
+            {/* Email TextInput */}
+            <TextInput
+                style={styles.input}
+                placeholder="Enter Email"
+                placeholderTextColor="#999"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+            />
 
-      {/* Login Button */}
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginButtonText}>Login</Text>
-      </TouchableOpacity>
+            {/* Password TextInput */}
+            <TextInput
+                style={styles.input}
+                placeholder="Enter Password"
+                placeholderTextColor="#999"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={true}
+            />
 
-      {/* Register Link */}
-      <TouchableOpacity
-        style={{ justifyContent: 'center', alignItems: 'center' }}
-        onPress={() => {
-          navigation.navigate('Register');
-        }}
-      >
-        <Text style={{ color: 'red' }}>Don't have an account? Register</Text>
-      </TouchableOpacity>
-    </View>
-  );
+            {/* Login Button */}
+            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+                <Text style={styles.loginButtonText}>Login</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={ForgotPass}>
+                    <Text style={styles.forgotPassword}>Forgot your password?</Text>
+                </TouchableOpacity>
+
+            {/* Register Link */}
+            <TouchableOpacity
+                style={{ justifyContent: 'center', alignItems: 'center' }}
+                onPress={() => {
+                    navigation.navigate('Register');
+                }}
+            >
+                
+                <Text style={{ color: 'red' }}>Don't have an account? Register</Text>
+            </TouchableOpacity>
+        </ScrollView>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -92,19 +106,27 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: BG_COLOR,
         paddingHorizontal: scale(20),
-      },
-      banner: {
+    },
+    banner: {
         width: '100%',
         height: moderateVerticalScale(210),
-      },
-      txt: {
+    },
+    txt: {
         fontSize: moderateScale(25),
         fontWeight: '700',
         color: TEXT_COLOR,
         alignSelf: 'center',
         marginTop: moderateScale(5),
-      },
-      input: {
+    },
+
+    forgotPassword: {
+        padding:scale(2),
+        textAlign: 'center',
+        color: '#5DB075',
+        marginTop: scale(2),
+        fontSize: 16,
+    },
+    input: {
         width: '100%',
         height: moderateVerticalScale(50),
         borderColor: '#ccc',
@@ -114,17 +136,17 @@ const styles = StyleSheet.create({
         marginVertical: moderateScale(10),
         color: TEXT_COLOR,
         fontSize: moderateScale(16),
-      },
-      loginButton: {
+    },
+    loginButton: {
         backgroundColor: '#4CAF50',
-        paddingVertical: moderateVerticalScale(12),
+        paddingVertical: moderateVerticalScale(10),
         borderRadius: moderateScale(10),
         alignItems: 'center',
         marginVertical: moderateScale(10),
-      },
-      loginButtonText: {
+    },
+    loginButtonText: {
         color: WHITE,
         fontSize: moderateScale(18),
         fontWeight: '600',
-      },
+    },
 });

@@ -10,9 +10,11 @@ import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Add AsyncStorage import
 import { launchCamera } from 'react-native-image-picker';
+import Loader from '../../components/Loader';
 
 const AddCourse = () => {
-    const[userid,setuserid]= useState('');
+
+    const[Loading,setLoading]= useState(false);
     const [title, setTitle] = useState('');
     const [price, setPrice] = useState('');
     const [Disc, setDisc] = useState('');
@@ -28,6 +30,7 @@ const AddCourse = () => {
     };
     const uploadCourse = async () => {
         try {
+            setLoading(true)
             // Generate random user ID
             const userID = parseInt(Math.random() * 10000); 
             console.log("Generated user ID is:", userID);
@@ -63,6 +66,7 @@ const AddCourse = () => {
             });
     
             console.log('Course data stored successfully');
+            setLoading(false)
             navigation.goBack();
         } catch (error) {
             console.error('Error uploading course:', error);
@@ -96,6 +100,7 @@ const AddCourse = () => {
             <TouchableOpacity style={styles.btn} onPress={uploadCourse}>
                 <Text style={styles.title}>Upload</Text>
             </TouchableOpacity>
+            <Loader visible={Loading}/>
         </ScrollView>
     );
 };

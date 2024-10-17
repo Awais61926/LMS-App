@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import auth from '@react-native-firebase/auth';
+import auth, { firebase } from '@react-native-firebase/auth';
 import { Dropdown } from 'react-native-element-dropdown';
 import { TEXT_COLOR } from '../utils/Colors';
 import firestore from '@react-native-firebase/firestore'
@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Register = ({ navigation }) => {
   const route = useRoute();
+  
 
   const data=[
     {label1: 'Tutor', value:'Tutor'},
@@ -22,8 +23,6 @@ const Register = ({ navigation }) => {
   // setuserRole=route.params.Screen;
 
    const handleSignUp = async () => {
-    await AsyncStorage.setItem('userName', username);
-    
     if (useremail === '' || password === '') {
       Alert.alert('Error', 'Please fill in all fields');
       return;
@@ -101,9 +100,6 @@ const Register = ({ navigation }) => {
       </TouchableOpacity>
 
       {/* Forgot Password Link */}
-      <TouchableOpacity onPress={() => { /* Handle navigation to forgot password */ }}>
-        <Text style={styles.forgotPassword}>Forgot your password?</Text>
-      </TouchableOpacity>
 
       {/* Navigate to Login */}
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
@@ -153,12 +149,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '600',
-  },
-  forgotPassword: {
-    textAlign: 'center',
-    color: '#5DB075',
-    marginTop: 20,
-    fontSize: 16,
   },
   loginText: {
     textAlign: 'center',
