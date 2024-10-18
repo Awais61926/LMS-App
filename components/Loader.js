@@ -9,7 +9,6 @@ export default function Loader({visible}) {
         <View style={{flex:1, backgroundColor:'rgba(0,0,0,0.5)', justifyContent:'center', alignItems:'center'}}>
             <View style={{width:moderateScale(50), height:moderateVerticalScale(50),  justifyContent:'center', alignItems:'center'}}>
                 <ActivityIndicator size={'xxlarge'}/>
-
             </View>
 
         </View>

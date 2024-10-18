@@ -6,6 +6,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth'; // Firebase Authentication import
 import { ScrollView } from 'react-native-gesture-handler';
+import firestore from '@react-native-firebase/firestore';
 import { firebase } from '@react-native-firebase/auth';
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -34,12 +35,23 @@ export default function Login() {
             .signInWithEmailAndPassword(email, password)
             .then(async () => {
                 console.log('User signed in!');
+
                 // Store email string directly
                 await AsyncStorage.setItem('userEmail', email);
-                if (route.params?.Screen === 'tutor') {
+                const userQuerySnapshot = await firestore().collection('users')
+                    .where("email", "==", email)
+                    .get();
+
+                // Extract the role from the query result
+                let userRole = null;
+                userQuerySnapshot.forEach(doc => {
+                    userRole = doc.data().role; // Assuming each document has a 'role' field
+                });
+
+                if (userRole === 'Tutor') {
                     navigation.navigate('TutorHome');
                 } else {
-                    navigation.navigate('TutorHome');
+                    navigation.navigate('LearnerHome');
                 }
             })
             .catch(error => {
@@ -84,8 +96,8 @@ export default function Login() {
                 <Text style={styles.loginButtonText}>Login</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={ForgotPass}>
-                    <Text style={styles.forgotPassword}>Forgot your password?</Text>
-                </TouchableOpacity>
+                <Text style={styles.forgotPassword}>Forgot your password?</Text>
+            </TouchableOpacity>
 
             {/* Register Link */}
             <TouchableOpacity
@@ -94,7 +106,7 @@ export default function Login() {
                     navigation.navigate('Register');
                 }}
             >
-                
+
                 <Text style={{ color: 'red' }}>Don't have an account? Register</Text>
             </TouchableOpacity>
         </ScrollView>
@@ -120,7 +132,7 @@ const styles = StyleSheet.create({
     },
 
     forgotPassword: {
-        padding:scale(2),
+        padding: scale(2),
         textAlign: 'center',
         color: '#5DB075',
         marginTop: scale(2),

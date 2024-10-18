@@ -1,30 +1,30 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import auth, { firebase } from '@react-native-firebase/auth';
+import auth from '@react-native-firebase/auth';
 import { Dropdown } from 'react-native-element-dropdown';
 import { TEXT_COLOR } from '../utils/Colors';
-import firestore from '@react-native-firebase/firestore'
+import firestore from '@react-native-firebase/firestore';
 import { scale } from 'react-native-size-matters';
 import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Register = ({ navigation }) => {
   const route = useRoute();
-  
 
-  const data=[
-    {label1: 'Tutor', value:'Tutor'},
-    {label2:'Learner', value:'Learner'}
-  ]
+  // Dropdown Data
+  const roleOptions = [
+    { label: 'Tutor', value: 'Tutor' },
+    { label: 'Learner', value: 'Learner' }
+  ];
+
   const [username, setuserName] = useState('');
   const [useremail, setuserEmail] = useState('');
-  // const [userRole, setuserRole] = useState('');
   const [password, setPassword] = useState('');
-  // setuserRole=route.params.Screen;
+  const [role, setRole] = useState(null); // State to store selected role
 
-   const handleSignUp = async () => {
-    if (useremail === '' || password === '') {
-      Alert.alert('Error', 'Please fill in all fields');
+  const handleSignUp = async () => {
+    if (useremail === '' || password === '' || !role) {
+      Alert.alert('Error', 'Please fill in all fields and select a role');
       return;
     }
 
@@ -32,24 +32,29 @@ const Register = ({ navigation }) => {
       .createUserWithEmailAndPassword(useremail, password)
       .then(async () => {
         Alert.alert('Success! User Account Created');
-        firestore().collection('users').add({
-          email:useremail,
-          name:username,
-          password:password,
-        })
         
+        // Save user data including role in Firestore
+        await firestore().collection('users').add({
+          email: useremail,
+          name: username,
+          password: password,
+          role: role,  // Save the role
+        });
+
+        // Save role in AsyncStorage
+        await AsyncStorage.setItem('userRole', role);
+
+        // Navigate to Login screen after registration
         navigation.navigate('Login');
       })
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {
           Alert.alert('Error', 'That email address is already in use!');
-        }
-
-        if (error.code === 'auth/invalid-email') {
+        } else if (error.code === 'auth/invalid-email') {
           Alert.alert('Error', 'That email address is invalid!');
+        } else {
+          Alert.alert('Error', error.message);
         }
-
-        Alert.alert('Error', error.message);
       });
   };
 
@@ -87,19 +92,24 @@ const Register = ({ navigation }) => {
         onChangeText={setPassword}
         secureTextEntry
       />
-      {/* <Dropdown data={data} maxHeight={300}
-          placeholderStyle={{color:TEXT_COLOR}}
-          search
-          labelField="label"
-          valueField="value" 
-          inputSearchStyle={{color:TEXT_COLOR, fontSize:scale(15)}}/> */}
+
+      {/* Dropdown for Role Selection */}
+      <Dropdown
+        style={styles.dropdown}
+        data={roleOptions}
+        labelField="label"
+        valueField="value"
+        placeholder="Select Role"
+        value={role}
+        onChange={item => setRole(item.value)} // Set selected role
+        placeholderStyle={{ color: TEXT_COLOR }}
+        inputSearchStyle={{ color: TEXT_COLOR, fontSize: scale(15) }}
+      />
 
       {/* Sign Up Button */}
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
-
-      {/* Forgot Password Link */}
 
       {/* Navigate to Login */}
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
@@ -135,6 +145,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontSize: 16,
     color: '#333',
+  },
+  dropdown: {
+    width: '100%',
+    height: 50,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    marginBottom: 20,
   },
   button: {
     width: '100%',

@@ -79,7 +79,7 @@ const AddCourse = () => {
             <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
                 <TouchableOpacity style={styles.banner} onPress={addBanner}>
                     {bannerImage != null ? (
-                        <Image source={{ uri: bannerImage.assets[0].uri }} style={{ width: scale(200), height: scale(170) }} />
+                        <Image source={{ uri: bannerImage.assets[0].uri }} style={{ width: moderateScale(300), height: moderateVerticalScale(200) }} />
                     ) : (
                         <>
                             <Image source={require('../../images/plus2.png')} style={styles.img} />

@@ -8,6 +8,8 @@ import Login from '../login/Login';
 import TutorHome from '../tutor/TutorHome';
 import AddCourse from '../tutor/courses/AddCourse';
 import Register from '../login/Register';
+import LearnerHome from '../learner/LearnerHome';
+import CourseView from '../tutor/courses/CourseView';
 
 const Stack = createStackNavigator();
 export default function MainNavigator() {
@@ -19,8 +21,9 @@ export default function MainNavigator() {
       <Stack.Screen name='Login' component={Login} options={{headerShown:false}} />
       <Stack.Screen name='Register' component={Register} options={{headerShown:false}} />
       <Stack.Screen name='TutorHome' component={TutorHome} options={{headerShown:false}} />
+      <Stack.Screen name='CourseView' component={CourseView} options={{headerShown:true}} />
       <Stack.Screen name='AddCourse' component={AddCourse} options={{headerShown:true}} />
-      
+      <Stack.Screen name='LearnerHome' component={LearnerHome} options={{headerShown:false}} />
     </Stack.Navigator>
     </NavigationContainer>
   )
