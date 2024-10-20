@@ -2,52 +2,55 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Alert } fro
 import React, { useState } from 'react';
 import { BG_COLOR, TEXT_COLOR, WHITE } from '../utils/Colors';
 import { moderateScale, moderateVerticalScale, scale } from 'react-native-size-matters';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import auth from '@react-native-firebase/auth'; // Firebase Authentication import
+import auth from '@react-native-firebase/auth';
 import { ScrollView } from 'react-native-gesture-handler';
 import firestore from '@react-native-firebase/firestore';
-import { firebase } from '@react-native-firebase/auth';
+
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const route = useRoute();
     const navigation = useNavigation();
+
     const ForgotPass = () => {
         auth().sendPasswordResetEmail(email)
             .then(() => {
-                Alert.alert('password reset email send!')
+                Alert.alert('Password reset email sent!')
             }).catch((error) => {
-                Alert.alert(error)
-            })
-    }
-
-
+                Alert.alert(error.message)
+            });
+    };
 
     const handleLogin = async () => {
         if (email === '' || password === '') {
             Alert.alert('Validation Error', 'Please enter both email and password');
             return;
         }
-        // await AsyncStorage.setItem('userRole', route.params.Screen);
 
         auth()
             .signInWithEmailAndPassword(email, password)
             .then(async () => {
                 console.log('User signed in!');
 
-                // Store email string directly
+                // Store email in AsyncStorage
                 await AsyncStorage.setItem('userEmail', email);
+                
+                // Fetch the user's role from Firestore
                 const userQuerySnapshot = await firestore().collection('users')
                     .where("email", "==", email)
                     .get();
 
-                // Extract the role from the query result
+                // Extract the role from Firestore query result
                 let userRole = null;
                 userQuerySnapshot.forEach(doc => {
                     userRole = doc.data().role; // Assuming each document has a 'role' field
                 });
 
+                // Store the role in AsyncStorage
+                await AsyncStorage.setItem('userRole', userRole);
+
+                // Navigate based on user role
                 if (userRole === 'Tutor') {
                     navigation.navigate('TutorHome');
                 } else {
@@ -95,6 +98,7 @@ export default function Login() {
             <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
                 <Text style={styles.loginButtonText}>Login</Text>
             </TouchableOpacity>
+
             <TouchableOpacity onPress={ForgotPass}>
                 <Text style={styles.forgotPassword}>Forgot your password?</Text>
             </TouchableOpacity>
@@ -106,7 +110,6 @@ export default function Login() {
                     navigation.navigate('Register');
                 }}
             >
-
                 <Text style={{ color: 'red' }}>Don't have an account? Register</Text>
             </TouchableOpacity>
         </ScrollView>
@@ -130,7 +133,6 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginTop: moderateScale(5),
     },
-
     forgotPassword: {
         padding: scale(2),
         textAlign: 'center',

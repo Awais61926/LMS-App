@@ -16,18 +16,12 @@ export default function ChooseUserType() {
       <Text style={styles.txt}>{USER_TYPE}</Text>
       <BgButton title={TUTOR_TYPE}
       color={WHITE}
-      onClick={()=>{navigation.navigate('Login',{
-        Screen:'tutor'
-      })
-        
+      onClick={()=>{navigation.navigate('Login')
       }}
       />
       <BorderButton
       title={STD_TYPE}
-      onClick={()=>{navigation.navigate('Login',
-    {
-      Screen:'tutor'
-    })
+      onClick={()=>{navigation.navigate('Login')
         
     }}
       />
