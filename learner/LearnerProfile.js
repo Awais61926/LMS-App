@@ -8,19 +8,18 @@ import { useNavigation } from '@react-navigation/native'
 const LearnerProfile=()=> {
      const navigation = useNavigation();
     // const learnerEmail= AsyncStorage.getItem('userEmail')
-    const handleLogout=async ()=>{
-        await auth().signOut();
-        console.log('user signed out.');
-        navigation.replace('Login');
-        
-    }
+    const handleSignOut = async () => {
+      await AsyncStorage.removeItem('userRole'); // Clear the user role
+      navigation.replace('Login'); // Navigate to the login screen
+    };
+    
   return (
     <View style={{ flex:1,backgroundColor:WHITE, alignItems:'center',justifyContent:'center'}}>
       <Image source={require('../images/learnerprofile3.png')} style={styles.img}/>
       <Text>
         {/* {learnerEmail} */}
       </Text>
-      <TouchableOpacity onPress={handleLogout}>
+      <TouchableOpacity onPress={handleSignOut}>
         <Text style={styles.txt}>Logout!</Text>
       </TouchableOpacity>
     </View>

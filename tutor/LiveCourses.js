@@ -38,7 +38,7 @@ export default function LiveCourses() {
             <FlatList
                 data={courses} 
                 renderItem={({ item, index }) => {
-                    return <CoursesList item={item} index={index} />;
+                    return <CoursesList item={item} role='tutor'/>;
                 }}
                 contentContainerStyle={styles.listContent}
             />
