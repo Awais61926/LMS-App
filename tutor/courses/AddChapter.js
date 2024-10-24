@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image, Switch } from 'react-native'; 
 import React, { useState } from 'react';
 import CustomTextInput from '../../components/CustomTextInput';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { moderateScale, moderateVerticalScale, scale, verticalScale } from 'react-native-size-matters';
 import { ScrollView } from 'react-native-gesture-handler';
 import BgButton from '../../components/BgButton';
@@ -9,23 +9,32 @@ import { TEXT_COLOR, THEME_COLOR, WHITE } from '../../utils/Colors';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Add AsyncStorage import
-import { launchCamera } from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Loader from '../../components/Loader';
 
 const AddChapter = () => {
 
     const[Loading,setLoading]= useState(false);
     const [title, setTitle] = useState('');
-    const [price, setPrice] = useState('');
     const [Disc, setDisc] = useState('');
     const [isActive, setIsActive] = useState(false);
     const [bannerImage, setBannerImage] = useState(null);
+    const [ChapterVideo, setChapterVideo]=useState(null);
+    const route=useRoute();
     const navigation = useNavigation();
-
+    const Ctitle=route.params.Coursetitle;
+    console.log(Ctitle);
     const addBanner = async () => {
-        const res = await launchCamera({ mediaType: 'photo' });
+        
+        const res = await launchImageLibrary({ mediaType: 'photo' });
         if (!res.didCancel) {
             setBannerImage(res);
+        }
+    };
+    const selectChapterVideo= async()=>{
+        const res=await launchImageLibrary({mediaType:'video'});
+        if(res!=null){
+            setChapterVideo(res);
         }
     };
     const uploadChapter = async () => {
@@ -47,21 +56,22 @@ const AddChapter = () => {
             }
     
             // Upload the banner image to Firebase Storage
-            const reference = storage().ref(bannerImage.assets[0].fileName);
-            const pathToFile = bannerImage.assets[0].uri;
+            const reference = storage().ref(ChapterVideo.assets[0].fileName);
+            const pathToFile = ChapterVideo.assets[0].uri;
             await reference.putFile(pathToFile);
     
             // Get the download URL
-            const url = await storage().ref(bannerImage.assets[0].fileName).getDownloadURL();
+            const url = await storage().ref(ChapterVideo.assets[0].fileName).getDownloadURL();
     
             // Store the course data in Firestore, directly using `userID`
-            await firestore().collection('courses').add({
-                title: title,
+            await firestore().collection('Chapters').add({
+                Courename:Ctitle,
+                Chaptername: title,
                 description: Disc,
-                price: price,
                 active: isActive,
                 email: userEmail,  // Upload email with course data
-                bannerImage: url,
+                ChapterBanner:bannerImage,
+                ChapterVideo: url,
                 userID: userID.toString(), // Using the generated userID directly
             });
     
@@ -75,7 +85,10 @@ const AddChapter = () => {
     
     return (
         <ScrollView style={styles.container}>
-            <View></View>
+            <View>
+            <Text style={styles.courseTitle}>{route.params.Coursetitle}</Text>
+            </View>
+            
             <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
                 <TouchableOpacity style={styles.banner} onPress={addBanner}>
                     {bannerImage != null ? (
@@ -87,9 +100,9 @@ const AddChapter = () => {
                         </>
                     )}
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.banner, {marginTop:scale(5)}]} onPress={addBanner}>
-                    {bannerImage != null ? (
-                        <Image source={{ uri: bannerImage.assets[0].uri }} style={{ width: moderateScale(300), height: moderateVerticalScale(200) }} />
+                <TouchableOpacity style={[styles.banner, {marginTop:scale(5)}]} onPress={selectChapterVideo}>
+                    {ChapterVideo != null ? (
+                        <Image source={{ uri: ChapterVideo.assets[0].uri }} style={{ width: moderateScale(300), height: moderateVerticalScale(200) }} />
                     ) : (
                         <>
                             <Image source={require('../../images/plus2.png')} style={styles.img} />
@@ -120,6 +133,17 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
+    courseTitle: {
+        fontSize: moderateScale(22),
+        fontWeight: 'bold',
+        color: TEXT_COLOR,
+        textAlign: 'center',
+        marginVertical: moderateScale(15),
+        textShadowColor: 'rgba(0, 0, 0, 0.3)',
+        textShadowOffset: { width: 2, height: 2 },
+        textShadowRadius: 3,
+    },
+    
     banner: {
         width: '90%',
         height: verticalScale(180),
