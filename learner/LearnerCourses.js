@@ -1,40 +1,36 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
-import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
-import { TEXT_COLOR, WHITE } from '../utils/Colors';
-import { useNavigation } from '@react-navigation/native';
+import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import React, {useState} from 'react';
+import {moderateScale, moderateVerticalScale, scale, verticalScale} from 'react-native-size-matters';
+import {TEXT_COLOR, WHITE} from '../utils/Colors';
+import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {firebase} from '@react-native-firebase/auth';
 
-const LearnerCourses = ({ item }) => {
-    const [liked,setliked] =useState(false)
+const LearnerCourses = ({item}) => {
+  const [liked, setliked] = useState(false);
   const navigation = useNavigation();
-  
+  //   const addlike=()=>{
+  //     firebase().collection('usercourses').add(
+  //         {
+
+  //         }
+  //     )
+
+  //   }
+
   return (
     <>
       <View style={styles.iconContainer}>
-        {liked==false?
-        (
-        <TouchableOpacity onPress={()=>setliked(true)}>
-        <View style={styles.heartBackgroundRed}>
-          <Icon name="heart" size={20} color="white" style={styles.hearticon} />
-        </View>
-      </TouchableOpacity>
-        ):
-                <TouchableOpacity onPress={()=>setliked(false)}>
-                <View style={styles.heartBackgroundWhite}>
-                  <Icon name="heart" size={20} color="red" style={styles.hearticon} />
+        
+         <View style={styles.optionsBackgroundWhite}>        
+        <Icon name="ellipsis-v" size={27} color='black' style={{zIndex: 1}} />
                 </View>
-              </TouchableOpacity>
-
-
-        }
-
       </View>
 
       <TouchableOpacity
         style={styles.container}
-        onPress={() => navigation.navigate('CourseView', { item })}>
-        <Image source={{ uri: item.bannerImage }} style={styles.image} />
+        onPress={() => navigation.navigate('CourseView', {item})}>
+        <Image source={{uri: item.bannerImage}} style={styles.image} />
 
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.description}>{item.description}</Text>
@@ -69,19 +65,17 @@ const styles = StyleSheet.create({
     top: scale(10),
     right: scale(15),
   },
-  heartBackgroundRed: {
-    backgroundColor: '#ff4d4d', // Heart background color (Red)
-    padding: scale(8),          // Padding around the icon
-    borderRadius: scale(30),           // Make it a circular background
-    elevation: 5,               // Shadow for the heart icon (Android)
-   
-  },
-  heartBackgroundWhite: {
-    backgroundColor: WHITE, // Heart background color (Red)
-    padding: scale(8),          // Padding around the icon
-    borderRadius: scale(30),           // Make it a circular background
-    elevation: 5,               // Shadow for the heart icon (Android)
-   
+  optionsBackgroundWhite: {
+    justifyContent:'center',
+    alignItems:'center',
+    width:moderateScale(30),
+    height:moderateVerticalScale(30),
+
+    backgroundColor: WHITE, 
+    top:scale(8),
+    right:scale(7), 
+    borderRadius: scale(20),
+    elevation: 5, 
   },
   hearticon: {
     // You can remove additional styling here; it's managed by the background view.

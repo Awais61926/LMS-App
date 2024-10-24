@@ -5,14 +5,18 @@ import { useNavigation } from '@react-navigation/native';
 import { BG_COLOR, TEXT_COLOR, THEME_COLOR } from './utils/Colors';
 import { SPLASH_TAGLINE } from './utils/Strings';
 import ChooseUserType from './ChooseUserType';
+import LearnerHome from './learner/LearnerHome';
 
 function Splash() {
   const navigation = useNavigation();
   const [userEmail, setUserEmail] = useState(null);
+  const[userRole,setuserRole] = useState(null);
 
   const checkUserEmail = async () => {
     try {
       const email = await AsyncStorage.getItem('userEmail');
+      const userRole = await AsyncStorage.getItem('userRole');
+      setuserRole(userRole);
       setUserEmail(email);
     } catch (error) {
       console.error('Failed to retrieve user email:', error);
@@ -23,12 +27,17 @@ function Splash() {
     checkUserEmail();
     
     const timer = setTimeout(() => {
-      if (userEmail) {
+      if (userEmail && userRole=='Tutor') {
         navigation.navigate('TutorHome');
-      } else {
-        navigation.navigate('ChooseUserType');
+      } else if(userEmail && userRole=='Learner'){
+        navigation.navigate('LearnerHome');
+        
       }
-    }, 3000);
+      else (
+        navigation.navigate('Login')
+      )
+  
+  }, 3000);
     
 
     return () => clearTimeout(timer); // Cleanup the timer when the component unmounts

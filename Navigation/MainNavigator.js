@@ -11,6 +11,7 @@ import Splash from '../Splash';  // Import your Splash screen
 import Register from '../login/Register';
 import ChooseUserType from '../ChooseUserType';
 import AddCourse from '../tutor/courses/AddCourse';
+import AddChapter from '../tutor/courses/AddChapter';
 
 const Stack = createStackNavigator();
 
@@ -85,6 +86,11 @@ export default function MainNavigator() {
         <Stack.Screen 
           name="CourseView" 
           component={CourseView} 
+          options={{ headerShown: false }} 
+        />
+          <Stack.Screen 
+          name="AddChapter" 
+          component={AddChapter} 
           options={{ headerShown: false }} 
         />
       </Stack.Navigator>

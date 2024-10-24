@@ -9,26 +9,26 @@ import { TEXT_COLOR, THEME_COLOR, WHITE } from '../../utils/Colors';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Add AsyncStorage import
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { launchCamera } from 'react-native-image-picker';
 import Loader from '../../components/Loader';
 
-const AddCourse = () => {
+const AddChapter = () => {
 
     const[Loading,setLoading]= useState(false);
     const [title, setTitle] = useState('');
     const [price, setPrice] = useState('');
     const [Disc, setDisc] = useState('');
-    const [isActive, setIsActive] = useState(true);
+    const [isActive, setIsActive] = useState(false);
     const [bannerImage, setBannerImage] = useState(null);
     const navigation = useNavigation();
 
     const addBanner = async () => {
-        const res = await launchImageLibrary({ mediaType: 'photo' });
+        const res = await launchCamera({ mediaType: 'photo' });
         if (!res.didCancel) {
             setBannerImage(res);
         }
     };
-    const uploadCourse = async () => {
+    const uploadChapter = async () => {
         try {
             setLoading(true)
             // Generate random user ID
@@ -83,21 +83,30 @@ const AddCourse = () => {
                     ) : (
                         <>
                             <Image source={require('../../images/plus2.png')} style={styles.img} />
-                            <Text style={{ fontWeight: '800', color: 'black' }}>Select Banner</Text>
+                            <Text style={{ fontWeight: '800', color: 'black' }}>Select Chapter Baneer</Text>
+                        </>
+                    )}
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.banner, {marginTop:scale(5)}]} onPress={addBanner}>
+                    {bannerImage != null ? (
+                        <Image source={{ uri: bannerImage.assets[0].uri }} style={{ width: moderateScale(300), height: moderateVerticalScale(200) }} />
+                    ) : (
+                        <>
+                            <Image source={require('../../images/plus2.png')} style={styles.img} />
+                            <Text style={{ fontWeight: '800', color: 'black' }}>Select Chapter Video</Text>
                         </>
                     )}
                 </TouchableOpacity>
             </View>
-            <CustomTextInput placeholder="Enter Course Title" onChangeText={(txt) => setTitle(txt)} />
-            <CustomTextInput placeholder="Enter Description" multiline={true} onChangeText={(txt) => setDisc(txt)} />
-            <CustomTextInput placeholder="Enter Price in PKR" keyboardType="numeric" onChangeText={(txt) => setPrice(txt)} />
-
+            <CustomTextInput placeholder="Enter Chapter Title" onChangeText={(txt) => setTitle(txt)} />
+            <CustomTextInput placeholder="Enter Chapter Description" multiline={true} onChangeText={(txt) => setDisc(txt)} />
+            
             <View style={styles.switchContainer}>
-                <Text style={styles.switchText}>Course is Active</Text>
+                <Text style={styles.switchText}>Chapter is Locked</Text>
                 <Switch value={isActive} onValueChange={(value) => setIsActive(value)} />
             </View>
 
-            <TouchableOpacity style={styles.btn} onPress={uploadCourse}>
+            <TouchableOpacity style={styles.btn} onPress={uploadChapter}>
                 <Text style={styles.title}>Upload</Text>
             </TouchableOpacity>
             <Loader visible={Loading}/>
@@ -105,7 +114,7 @@ const AddCourse = () => {
     );
 };
 
-export default AddCourse;
+export default AddChapter;
 
 const styles = StyleSheet.create({
     container: {
